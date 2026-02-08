@@ -1,0 +1,29 @@
+from typing import Callable
+from sqlalchemy.orm import Session
+
+from app.application.uow.base import UnitOfWork
+from app.infra.repository.sqlalchemy_calendar import SQLAlchemyCalendarRepository
+from app.infra.repository.sqlalchemy_list_tasks import SQLAlchemyListTasksRepository
+
+
+class SQLAlchemyUnitOfWork(UnitOfWork):
+   _session_factory: Callable[[], Session]
+   
+   def __enter__(self):
+      self.session: Session = self._session_factory()
+      self.list_tasks_repo = SQLAlchemyListTasksRepository(self.session)
+      self.calendar_repo = SQLAlchemyCalendarRepository(self.session)
+      return self
+   
+   def __exit__(self, exc_type, exc, tb):
+      if exc_type:
+         self.rollback()
+      else:
+         self.commit()
+      self.session.close()
+   
+   def commit(self):
+      self.session.commit()
+   
+   def rollback(self):
+      self.session.rollback()
