@@ -20,12 +20,5 @@ class ListTasksRepository(ABC):
       ...
    
    @abstractmethod
-   def get_by_id(self, lost_tasks_id: str) -> ListTasksModel:
-      ...
-
-@dataclass
-class CalendarRepository(ABC):
-   
-   @abstractmethod
-   def save(self):
+   def get_by_id(self, lost_tasks_id: str) -> ListTasks:
       ...

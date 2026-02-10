@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.domain.entities.tasks import ListTasks
 from app.infra.db.models.tasks import ListTasksModel, TaskModel
-from app.infra.repository.base import ListTasksRepository
+from app.infra.repository.command.base import ListTasksRepository
 
 @dataclass
 class SQLAlchemyListTasksRepository(ListTasksRepository):
@@ -33,3 +33,14 @@ class SQLAlchemyListTasksRepository(ListTasksRepository):
       model = self.session.get(ListTasksModel, list_tasks_id)
       if model:  
          self.session.delete(model)
+         return True
+   
+   def get_by_id(self, list_tasks_id: str) -> ListTasks:
+      stmt = select(ListTasksModel).where(ListTasksModel.id == list_tasks_id)
+      result = self.session.execute(stmt)
+      list_tasks = result.scalars().first()
+      
+      if list_tasks is None:
+         return None
+      
+      return list_tasks.to_entity()

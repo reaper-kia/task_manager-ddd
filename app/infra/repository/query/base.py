@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from app.application.query.calendar_dto import CalendarReadDTO
 from app.application.query.dto import ListTasksReadDTO
 
 @dataclass
@@ -13,12 +12,4 @@ class ListTasksQueryRepository(ABC):
    
    @abstractmethod
    def get_all_lists(self) -> list[ListTasksReadDTO]:
-      ...
-
-
-@dataclass
-class CalendarQueryRepository(ABC):
-   
-   @abstractmethod
-   def get_by_user_id(self, user_id) -> CalendarReadDTO:
       ...

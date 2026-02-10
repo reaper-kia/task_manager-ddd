@@ -9,7 +9,6 @@ from app.domain.value_objects.tasks import Description, Title
 class Task(BaseEntity):
    title: Title
    description: Description | None = None
-   id: str = field(default_factory=lambda: str(uuid4()))
    is_complete: bool = False
    
    @classmethod
@@ -23,16 +22,16 @@ class Task(BaseEntity):
          description=description,
          )
    
-   def _complete(self):
+   def _complete(self) -> 'Task':
       if self.is_complete:
          raise TaskAlreadyCompleteException(self.id)   
       self.is_complete = True
+      return self
 
 @dataclass
 class ListTasks(BaseEntity):
    title: Title
    description: Description | None = None
-   id: str = field(default_factory=lambda: str(uuid4()))
    tasks: list[Task] = field(default_factory=list)
 
    
@@ -48,6 +47,7 @@ class ListTasks(BaseEntity):
    def complete_task(self, task_id: str):
       task = self.get_task(task_id)
       task._complete()
+      return self
    
    def remove_task(self, task_id):
       task = self.get_task(task_id)

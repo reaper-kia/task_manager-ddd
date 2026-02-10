@@ -4,7 +4,6 @@ from sqlalchemy import Boolean, ForeignKey, String
 
 from app.domain.entities.tasks import ListTasks, Task
 from app.domain.value_objects.tasks import Description, Title
-from app.infra.db.models.calendar import DayModel
 from app.infra.db.session import Base
 
 
@@ -16,12 +15,6 @@ class ListTasksModel(Base):
    description: Mapped[Optional[str]] = mapped_column(String(1023))
    tasks: Mapped[list["TaskModel"]] = relationship(back_populates="task_list", cascade="all, delete-orphan", lazy="selectin")
    
-   days: Mapped[list["DayModel"]] = relationship(
-        "DayModel",
-        secondary="day_list_tasks_association",
-        back_populates="list_tasks"
-    )
-   
    @classmethod
    def from_entity(cls, list_tasks: ListTasks):
       model = cls(
@@ -30,7 +23,7 @@ class ListTasksModel(Base):
          description=list_tasks.description.value if list_tasks.description else None,
       )
       model.tasks = [
-         TaskModel.from_entity(task) for task in list_tasks.tasks
+         TaskModel.from_entity(list_tasks_id=list_tasks.id, task=task) for task in list_tasks.tasks
       ]
       return model
    
